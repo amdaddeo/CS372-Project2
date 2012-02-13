@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<link rel="stylesheet" type="text/css" href="ans.css" />
+
+<title>C Style Guide</title>
+<meta NAME="keywords" CONTENT="Alison N. Smith Norman">
+</head>
+
+<body>
+
+<div class="interior-content">
+<!-- * MAIN TEXT * -->
+    <td VALIGN="CENTER" WIDTH="100%">
+ <font face=arial > 
+
+      <!-- *NAV BAR* -->
+      <table WIDTH=100% BORDER=0 BGCOLOR=white CELLSPACING=0 CELLPADDING=0 HEIGHT=25 LINK=white>
+	<tr>
+	  <td width=120 align=center><small><a HREF="../../index.html" target=_top><b>Home</b></a></small></td>
+
+	  <td width=120
+	  align=center><small><a HREF="cs372_spring2012.html"
+	  target=_top><b>CS372</b></a></small></td>
+	</tr>
+      </table>
+<hr>
+<br>
+<div style="text-align: center;"><big style="font-weight: bold;"><big>CS
+372: C Style Guide</big></big><br>
+</div>
+<br>
+    <p> Programming is not a dry mechanical process, but a form of art. Well
+    written code has an aesthetic appeal while poor form can make other
+    programmers and instructors cringe. Programming assignments will be
+    graded based on style and correctness. Good programming practices
+    usually include many of the following principles:
+
+    <h2 id="style">General Programming Style</h2>
+    <ul><li>A comment at the top of the program that includes
+         <ul><li>Program authors</li> <li> Date or Dates </li>
+
+             <li>A brief description of what the program does</li>
+         </ul>
+
+         </li>
+         <li>Concise comments that summarize major sections of your
+         code</li>
+         <li>Meaningful variable and function names</li>
+         <li>Function comments that include: (1) description of what function does;
+                (2) description of input values (parameter values); (3) description of 
+                return value(s)</li>
+         <li>Well organized code</li>
+
+         <li>White space or comments to improve legibility</li>
+         <li>Avoidance of large blocks of copy-pasted code (use functions!)</li>
+    </ul>
+
+    <h2 id="style">Specific Guidelines</h2>
+<big style="font-weight: bold;">Code Layout</big><br>
+<ul>
+  <li>Indentation: Use 3 spaces per indentation level, or some
+consistent number of spaces. Two spaces is probably not enough, more
+than 6 is probably too many. <br>
+  </li>
+  <li>Tabs or Spaces: Never, ever, mix tabs and spaces. <br>
+  </li>
+  <li>Limit lines to 80 characters. This avoids line wrapping. </li>
+  <li>Blank lines: Use blank lines before and after a function
+definition, and to separate segments of code. Blank lines should be
+used to increase readability of your code. Do not separate every two
+statements by a blank line.&nbsp;</li>
+  <li>Whitespace: <br>
+  </li>
+  <ul>
+    <li>Do not use extra whitespace inside brackets and braces:</li>
+    <ul>
+      <li>Do this: myFunction(a[2], {1, 2})</li>
+      <li>Not this: myFunction(&nbsp; a[&nbsp; 2 ],&nbsp;&nbsp; {&nbsp;
+1,&nbsp;&nbsp; 2})</li>
+    </ul>
+    <li>In a function call, do not separate the function name and its
+argument list by whitespace:</li>
+    <ul>
+      <li>Do this: myFunction(1)</li>
+      <li>Not this: myFunction&nbsp; (1)</li>
+    </ul>
+    <li>Use a blank space before and after the = sign in an assignment
+statement: i = i+1</li>
+    <li>Do not include multiple statements on the same line. This
+reduces readability.</li>
+    <li>Separate an in-line comment from the statement by at least 2
+blank spaces:</li>
+    <ul>
+      <li>i = i+1&nbsp;&nbsp; /* add 1 to i */</li>
+      <li>&nbsp;Don't do this: i = i+1/*add 1 to i*/</li>
+    </ul>
+  </ul>
+</ul>
+<br>
+<br>
+<big style="font-weight: bold;">Comments</big><br>
+<ul>
+  <li>Use a couple of comments before a function or module to briefly
+describe what the function (or module) does. Likewise, before a chunk
+of related statements, include comments that describe briefly what the
+chunk does. <br>
+  </li>
+  <li>Don't use too many in-line comments. If you feel a need for them,
+you probably aren't using enough comments at the beginning of functions
+and complicated code segments. <br>
+  </li>
+</ul>
+<br>
+<big style="font-weight: bold;">Naming Conventions</big><br>
+<br>
+<ul>
+  <li>Begin all variables with a lower case letter, except those that
+  are naming a class or a struct
+  <li>All #define-s should be uppercase---multiple words may be
+  separated by underscores.
+  <li>Use meaningful names. Except for a loop index, it's rarely a good
+idea to have a variable i or a variable x. An identifier's name should
+give the reader a clue about what it represents.<br>
+  </li>
+</ul>
+<br>
+</body>
+</html>
