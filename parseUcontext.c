@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
 
   printf("WORDSIZE %d\n", __WORDSIZE);
-  assert(__WORDSIZE == 32); // Do this project on a 32-bit x86 linux machine
+  assert(__WORDSIZE == 32); // Do this project on a 32-bit x86 liuux machine
   printf("NGREG %d\n", NGREG);
   assert(NGREG == 19);  // Do this project on a 32-bit x86 linux machine
 
@@ -44,8 +44,8 @@ int main(int argc, char **argv)
   /*
    * First, think about program counters (called eip in x86)
    */
-  printf("The memory address of the function main() is 0x%x\n", (unsigned int)-1);
-  printf("The memory address of the program counter (EIP) saved in mycontext is 0x%x\n", (unsigned int)-1);
+  printf("The memory address of the function main() is 0x%x\n", (unsigned int)*main);
+  printf("The memory address of the program counter (EIP) saved in mycontext is 0x%x\n", ((unsigned int)&mycontext.uc_stack.ss_sp)+4);
 
   /*
    * Now, think about stacks. [Note.  The code following these comments
@@ -102,8 +102,7 @@ probeUCStack(char *str)
 {
   ucontext_t newcontext;
   getcontext(&newcontext);
-  printf("%d", newcontext.uc_stack.ss_sp);
   
-  assert(0); 
-  return 0xFFFFFFFF;
+  unsigned int p = (unsigned int)newcontext.uc_stack.ss_sp;
+  return p;
 } 
