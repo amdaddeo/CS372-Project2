@@ -27,8 +27,8 @@ int main(int argc, char **argv)
   err = getcontext(&mycontext);
   assert(!err);
 
-  printf("A ucontext_t is %d bytes\n", -999);
-  assert(0); // TBD: Fill in ucontext size above. Hint: use sizeof().
+  printf("A ucontext_t is %d bytes\n", sizeof(ucontext_t));
+  assert(348); // TBD: Fill in ucontext size above. Hint: use sizeof().
 
   unsigned int anotherSample = probeUCStack("Dummy argument.");
 
@@ -100,6 +100,10 @@ int main(int argc, char **argv)
 unsigned int 
 probeUCStack(char *str)
 {
-  assert(0); /* Write code for this function */
+  ucontext_t newcontext;
+  getcontext(&newcontext);
+  printf("%d", newcontext.uc_stack.ss_sp);
+  
+  assert(0); 
   return 0xFFFFFFFF;
-}
+} 

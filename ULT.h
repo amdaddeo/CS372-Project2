@@ -9,7 +9,7 @@ typedef int Tid;
 
 
 typedef struct ThrdCtlBlk{
-  /* ... Fill this in ... */
+  struct ucontext *p;
 } ThrdCtlBlk;
 
 
