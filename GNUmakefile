@@ -65,11 +65,15 @@ ULT_LIB :=  -L . -l ULT
 # about structuring Makefiles for larger projects.
 #
 # Explicit dependencies instead, to keep things simple:
+
+queue: queue.c queue.h
+	gcc $(CFLAGS) -o $@ $<
+
 parseUcontext: parseUcontext.c 
 	gcc $(CFLAGS) -o $@ $<
 
 ULT.o: ULT.c ULT.h  $(MOREH)
-	gcc -c $(CFLAGS) -o $@ ULT.c
+	gcc -c $(CFLAGS) -o $@ ULT.c 
 
 interrupt.o: interrupt.c interrupt.h
 	gcc -c $(CFLAGS) -o $@ interrupt.c

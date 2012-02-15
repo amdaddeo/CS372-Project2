@@ -10,6 +10,7 @@ typedef int Tid;
 
 typedef struct ThrdCtlBlk{
   struct ucontext *p;
+  
 } ThrdCtlBlk;
 
 
