@@ -10,8 +10,17 @@
 #include "ULT.h"
 
 
-Tid 
-ULT_CreateThread(void (*fn)(void *), void *parg)
+//create queue out here. in each function, check to see if it
+//has been initialized. If it hasn't, initialize it.
+//also set running thread during this (thread/tid 0). 
+
+//aside: the running thread does not have to go on the queue.
+//it may be easier to implement. 
+
+//possible way to implement this is to keep a static
+//boolean in the header file. 
+
+Tid ULT_CreateThread(void (*fn)(void *), void *parg)
 {
   assert(0); /* TBD */
   return ULT_FAILED;
@@ -19,26 +28,26 @@ ULT_CreateThread(void (*fn)(void *), void *parg)
 
 
 
-Tid ULT_Yield(Tid wantTid)
+Tid ULT_Yield(Tid wantTid) //give control to wantTid
 {
-  Tid getsControl;
 
-  switch ((int)wantTid)
-  {
-   case -2 :
-    //printf("ULT_SELF\n");
-    return ULT_NONE;
-    getsControl = wantTid;
-   break;
-   case -3 :
-    printf("-3\n");
-   break;
-   default :
-    //printf("DEFAULT\n");
-   break;
+  /*
+   *Possible algorithm discussed in OA:
+   *find new thread in the RQ (ready queue)
+   *save context of current thread
+   *grab context of new thread
+   *put current thread in RQ
+   *set context to new thread
+   */
+
+  Tid retVal = ULT_ANY;
+  if(wantTid == ULT_SELF){
+    //check if queue initialized. act accordingly. 
+    //if it's not empty:
+    retVal = ULT_NONE;
   }
   
-  return 0;
+  return retVal;
 }
 
 

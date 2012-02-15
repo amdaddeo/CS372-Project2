@@ -7,9 +7,10 @@ typedef int Tid;
 #define ULT_MIN_STACK 32768
 
 
-
+//This struct need only contain ucontext and thread id
 typedef struct ThrdCtlBlk{
-  struct ucontext *p;
+  struct ucontext_t *p;
+  Tid tid;
   
 } ThrdCtlBlk;
 

@@ -88,7 +88,7 @@ int main(int argc, char **argv)
   printf("The number of bytes pushed onto the stack between argc and err was 0x%x\n", (unsigned int)(&argc - &err));
   /* Which is the right one to use? */
   printf("The number of bytes pushed onto the stack between err and when the stack was saved to mycontext was 0x%x\n", 
-         (unsigned int)(mycontext.uc_mcontext.gregs[REG_EIP]));
+         (unsigned int)(&err)-(unsigned int)mycontext.uc_stack.ss_sp);
 
 
   return 0;  
