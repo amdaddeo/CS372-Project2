@@ -44,9 +44,12 @@ int main(int argc, char **argv)
   /*
    * First, think about program counters (called eip in x86)
    */
-  printf("The memory address of the function main() is 0x%x\n", (unsigned int)*main);
-  printf("The memory address of the program counter (EIP) saved in mycontext is 0x%x\n", ((unsigned int)&mycontext.uc_stack.ss_sp)+4);
-
+  printf("The memory address of the function main() is 0x%x\n", (unsigned int)&main);
+  printf("The memory address of the program counter (EIP) saved in mycontext is 0x%x\n", ((unsigned int)mycontext.uc_mcontext.gregs[REG_EIP]));
+  //added by steve
+  //printf("Stack pointer: 0x%x\n", ((unsigned int)mycontext.uc_mcontext.gregs[REG_ESP]));
+  //printf("Program counter (EIP): 0x%x\n", ((unsigned int)&mycontext.uc_mcontext.gregs[REG_EIP]));
+  //end added by steve
   /*
    * Now, think about stacks. [Note.  The code following these comments
    * will help you do this.
@@ -70,12 +73,13 @@ int main(int argc, char **argv)
    * Don't move on to the next part of the lab until you know how to change
    * the stack in a context when you manipulate a context to create a new thread.
    */
-  printf("The memory address of the local variable err is 0x%x\n", (unsigned int)-1);
-  printf("The memory address of the argument argc is 0x%x\n", (unsigned int)-1);
+  printf("The memory address of the local variable err is 0x%x\n", (unsigned int) &err);
+  //printf("Alternatively, memory address of err using uc_stack.ss_sp-4: 0x%x\n", ((unsigned int)&mycontext.uc_stack.ss_sp)-4); //steve added
+  printf("The memory address of the argument argc is 0x%x\n", (unsigned int)&argc);
   printf("The value of ucontext_t.uc_stack is 0x%x\n", (unsigned int)mycontext.uc_stack.ss_sp);
   printf("The value of anotherSample is 0x%x\n", anotherSample);
-  printf("The stack pointer stored as one of the registers (ESP) in uc_mcontext is 0x%x\n", (unsigned int)-1);
-  printf("The stack pointer stored as another one of the `registers` (UESP) in uc_mcontext is 0x%x\n", (unsigned int)-1);
+  printf("The stack pointer stored as one of the registers (ESP) in uc_mcontext is 0x%x\n", (unsigned int)mycontext.uc_mcontext.gregs[REG_ESP]);
+  printf("The stack pointer stored as another one of the `registers` (UESP) in uc_mcontext is 0x%x\n", (unsigned int)mycontext.uc_mcontext.gregs[REG_ESP]);
 
 
   printf("The number of bytes pushed onto the stack between argc and err was 0x%x\n", (unsigned int)(0xFFFFFF));
@@ -95,6 +99,8 @@ int main(int argc, char **argv)
  * Is this the current stack pointer? The
  * top of the stack? The bottom of the stack?
  * One thing to do is to compare it to the
+    std::cout << "Total time taken for system call: " << tE - tS << std::endl;
+ints to the base of the signal stack. 
  * uc_stack.ss_sp saved in main().
  */
 unsigned int 
