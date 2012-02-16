@@ -1,6 +1,7 @@
 #ifndef _ULT_H_
 #define _ULT_H_
 #include <ucontext.h>
+#include "queue.c"
 
 typedef int Tid;
 #define ULT_MAX_THREADS 1024
@@ -29,6 +30,9 @@ static const Tid ULT_NONE = -4;
 static const Tid ULT_NOMORE = -5;
 static const Tid ULT_NOMEMORY = -6;
 static const Tid ULT_FAILED = -7;
+
+static int isInit __attribute__ ((unused))= 0;
+static queue Q __attribute__ ((unused))= NULL;
 
 static inline int ULT_isOKRet(Tid ret){
   return (ret >= 0 ? 1 : 0);

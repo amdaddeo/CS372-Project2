@@ -6,10 +6,10 @@
 #define __USE_GNU
 #endif /* __USE_GNU */
 #include <stdlib.h>
-
 #include "ULT.h"
 
 
+ 
 //create queue out here. in each function, check to see if it
 //has been initialized. If it hasn't, initialize it.
 //also set running thread during this (thread/tid 0). 
@@ -20,8 +20,18 @@
 //possible way to implement this is to keep a static
 //boolean in the header file. 
 
+void initQueue() {
+ Q = q_new();
+ isInit = 1;
+}
+
+
 Tid ULT_CreateThread(void (*fn)(void *), void *parg)
 {
+  if(isInit == 0) {
+   initQueue();
+  }
+
   assert(0); /* TBD */
   return ULT_FAILED;
 }
@@ -30,7 +40,9 @@ Tid ULT_CreateThread(void (*fn)(void *), void *parg)
 
 Tid ULT_Yield(Tid wantTid) //give control to wantTid
 {
-
+  if(isInit == 0) {
+   initQueue();
+  }
   /*
    *Possible algorithm discussed in OA:
    *find new thread in the RQ (ready queue)
@@ -42,9 +54,11 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
 
   Tid retVal = ULT_ANY;
   if(wantTid == ULT_SELF){
-    //check if queue initialized. act accordingly. 
-    //if it's not empty:
-    retVal = ULT_NONE;
+    if(empty(Q)) {
+     retVal = ULT_NONE;
+    } else {
+     retVal = wantTid;
+    }
   }
   
   return retVal;
@@ -53,11 +67,13 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
 
 Tid ULT_DestroyThread(Tid tid)
 {
+  if(isInit == 0){
+   initQueue();
+  }
+
   assert(0); /* TBD */
   return ULT_FAILED;
 }
-
-
 
 
 
