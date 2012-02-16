@@ -22,6 +22,8 @@
 
 void initQueue() {
  Q = q_new();
+ currentBlock=malloc(sizeof(ThrdCtlBlk));
+ currentBlock->tid = 0;
  isInit = 1;
 }
 
@@ -53,17 +55,45 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
    */
 
   Tid retVal = ULT_ANY;
-  if(wantTid == ULT_SELF){
-    if(empty(Q)) {
+  if(wantTid == ULT_SELF || wantTid == currentBlock->tid){
+    if(empty(Q) && wantTid != currentBlock->tid) {
      retVal = ULT_NONE;
     } else {
-     retVal = wantTid;
+     return  wantTid;
     }
+  } else if(wantTid == ULT_ANY) {
+   if(empty(Q)) {
+     return ULT_NONE;
+   } else {
+     //ULT_ANY with stuff on queue
+     ThrdCtlBlk *tmp=NULL;
+     dequeue(Q,tmp);
+     ucontext_t *currentContext=NULL;
+     getcontext(currentContext);
+     currentBlock->p = (struct ucontext_t *)currentContext;
+     enqueue(Q,*currentBlock);
+     currentBlock = tmp;
+     retVal = tmp->tid;
+     ucontext_t *nextContext = (ucontext_t *)tmp->p;
+     setcontext(nextContext);
+   }
   } else {
-   // Save current context
-   // Push onto queue
-   // Give control to wantTid thread
-   retVal = wantTid;
+   //Doesn't match any of the codes (ULT_ANY, etc)
+    ThrdCtlBlk *tmp=NULL;
+    int queued = extract(Q,wantTid,tmp);
+    if(queued) {
+     ucontext_t *currentContext=NULL;
+     getcontext(currentContext);
+     currentBlock->p = (struct ucontext_t *)currentContext;
+     enqueue(Q,*currentBlock);
+     currentBlock = tmp;
+     retVal = tmp->tid;
+     ucontext_t *nextContext = (ucontext_t *)tmp->p;
+     setcontext(nextContext);
+     }
+     else {
+      return ULT_INVALID;
+     }
   }
   
   return retVal;
@@ -125,14 +155,19 @@ int dequeue(queue q, ThrdCtlBlk *val)
 
 int extract(queue q, Tid val, ThrdCtlBlk *retval)
 {
+        if(empty(q)) {
+          return 0;
+        }
+
         node tmp = HEAD(q);
-        while(1)  //!(tmp->block == val) && tmp->next != 0)
+        while(tmp->next != 0)  //!(tmp->block == val) && tmp->next != 0)
         {
           ThrdCtlBlk tmpBlock = tmp->block;
           Tid tidval = tmpBlock.tid;
-          if(tidval == val || tmp->next == 0) {
-	    break;
-	  }
+           if(tidval == val) {
+              break;
+           }
+
           tmp = tmp->next;
         }
 
