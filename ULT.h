@@ -1,20 +1,19 @@
 #ifndef _ULT_H_
 #define _ULT_H_
 #include <ucontext.h>
-#include "queue.c"
 
 typedef int Tid;
 #define ULT_MAX_THREADS 1024
 #define ULT_MIN_STACK 32768
 
-
 //This struct need only contain ucontext and thread id
 typedef struct ThrdCtlBlk{
   struct ucontext_t *p;
   Tid tid;
-  
 } ThrdCtlBlk;
 
+typedef struct node_t node_t, *node, *queue;
+struct node_t { ThrdCtlBlk block; node prev, next; };
 
 /*
  * Tids between 0 and ULT_MAX_THREADS-1 may
@@ -32,7 +31,7 @@ static const Tid ULT_NOMEMORY = -6;
 static const Tid ULT_FAILED = -7;
 
 static int isInit __attribute__ ((unused))= 0;
-static queue Q __attribute__ ((unused))= NULL;
+static queue Q __attribute__ ((unused))=NULL;
 
 static inline int ULT_isOKRet(Tid ret){
   return (ret >= 0 ? 1 : 0);
@@ -41,6 +40,12 @@ static inline int ULT_isOKRet(Tid ret){
 Tid ULT_CreateThread(void (*fn)(void *), void *parg);
 Tid ULT_Yield(Tid tid);
 Tid ULT_DestroyThread(Tid tid);
+
+queue q_new();
+int empty(queue q);
+void enqueue(queue q, ThrdCtlBlk n);
+int dequeue(queue q, ThrdCtlBlk *val);
+int extract(queue q, Tid val, ThrdCtlBlk *retval);
 
 
  

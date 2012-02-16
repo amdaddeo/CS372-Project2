@@ -59,6 +59,11 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
     } else {
      retVal = wantTid;
     }
+  } else {
+   // Save current context
+   // Push onto queue
+   // Give control to wantTid thread
+   retVal = wantTid;
   }
   
   return retVal;
@@ -73,6 +78,77 @@ Tid ULT_DestroyThread(Tid tid)
 
   assert(0); /* TBD */
   return ULT_FAILED;
+}
+
+
+
+
+//////////////// QUEUE MANGAMENT ////////////////
+
+#define HEAD(q) q->prev
+#define TAIL(q) q->next
+queue q_new()
+{
+        node q = malloc(sizeof(node_t));
+        q->next = q->prev = 0;
+        return q;
+}
+
+int empty(queue q)
+{
+        return !HEAD(q);
+}
+
+void enqueue(queue q, ThrdCtlBlk n)
+{
+        node nd = malloc(sizeof(node_t));
+        nd->block = n;
+        if (!HEAD(q)) HEAD(q) = nd;
+        nd->prev = TAIL(q);
+        if (nd->prev) nd->prev->next = nd;
+        TAIL(q) = nd;
+        nd->next = 0;
+}
+
+int dequeue(queue q, ThrdCtlBlk *val)
+{
+        node tmp = HEAD(q);
+        if (!tmp) return 0;
+        *val = tmp->block;
+
+        HEAD(q) = tmp->next;
+        if (TAIL(q) == tmp) TAIL(q) = 0;
+        free(tmp);
+
+        return 1;
+}
+
+int extract(queue q, Tid val, ThrdCtlBlk *retval)
+{
+        node tmp = HEAD(q);
+        while(1)  //!(tmp->block == val) && tmp->next != 0)
+        {
+          ThrdCtlBlk tmpBlock = tmp->block;
+          Tid tidval = tmpBlock.tid;
+          if(tidval == val || tmp->next == 0) {
+	    break;
+	  }
+          tmp = tmp->next;
+        }
+
+        if(tmp->next != 0)
+        {
+          node p = tmp->prev;
+          node n = tmp->next;
+          p->next = n;
+          n->prev = p;
+	  retval = &tmp->block;
+          return 1;
+        }
+        else
+        {
+          return 0;
+        }
 }
 
 

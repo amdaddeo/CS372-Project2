@@ -66,18 +66,14 @@ ULT_LIB :=  -L . -l ULT
 #
 # Explicit dependencies instead, to keep things simple:
 
-queue: queue.c queue.h
-	gcc $(CFLAGS) -o $@ $<
-
 parseUcontext: parseUcontext.c 
 	gcc $(CFLAGS) -o $@ $<
 
-ULT.o: ULT.c ULT.h  $(MOREH)
-	gcc -c $(CFLAGS) -o $@ ULT.c 
+ULT.o: ULT.c ULT.h $(MOREH)
+	gcc -c $(CFLAGS) -o $@ ULT.c
 
 interrupt.o: interrupt.c interrupt.h
 	gcc -c $(CFLAGS) -o $@ interrupt.c
-
 
 doTest.o: doTest.c basicThreadTests.h interrupt.h ULT.h  $(MOREH)
 	gcc -c $(CFLAGS) -o $@ doTest.c

@@ -1,0 +1,5 @@
+checkUcontext.grade.out
+doTest.grade.out
+doTest2.grade.out
+*.o
+*.swp
