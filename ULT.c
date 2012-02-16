@@ -34,6 +34,30 @@ Tid ULT_CreateThread(void (*fn)(void *), void *parg)
    initQueue();
   }
 
+  ucontext_t *newContext=NULL;
+  getcontext(newContext);
+  ucontext_t *currentContext = (ucontext_t *)currentBlock->p;
+  // updating program counter
+  newContext->uc_mcontext.gregs[REG_EIP] = (unsigned int)&stub;
+  // allocate new stacka
+  newContext->uc_mcontext.gregs[REG_ESP] = (unsigned int)malloc(sizeof(stack_t));
+ // push pargs onto stack
+  newContext->uc_mcontext.gregs[REG_EBP+8]= (unsigned int)parg;
+ // push fn onto stack
+  newContext->uc_mcontext.gregs[REG_EBP+12]= (unsigned int)parg;
+  // save old frame pointer onto stack
+  newContext->uc_mcontext.gregs[REG_EBP+16] = currentContext->uc_mcontext.gregs[REG_EIP];
+  // 
+  newContext->uc_mcontext.gregs[REG_EBP] = currentContext->uc_mcontext.gregs[REG_EBP];
+  // push args onto stack
+  newContext->uc_mcontext.gregs[REG_EBP+8]= (unsigned int)parg;
+  ThrdCtlBlk *newBlock = malloc(sizeof(ThrdCtlBlk));
+  newBlock->p = (struct ucontext_t *)newContext;
+  newBlock->tid = tidInc++;
+  enqueue(Q,*newBlock);
+  // create a new context
+  // intilize it
+  // set to this context
   assert(0); /* TBD */
   return ULT_FAILED;
 }
@@ -187,4 +211,12 @@ int extract(queue q, Tid val, ThrdCtlBlk *retval)
 }
 
 
-
+void stub(void (*root)(void *), void *arg)
+    {
+        // thread starts here
+        Tid ret;
+        root(arg); // call root function
+        ret = ULT_DestroyThread(ULT_SELF);
+        assert(ret == ULT_NONE); // we should only get here if we are the last thread.
+        exit(0); // all threads are done, so process should exit 
+    } 

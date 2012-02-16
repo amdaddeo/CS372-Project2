@@ -31,6 +31,7 @@ static const Tid ULT_NOMEMORY = -6;
 static const Tid ULT_FAILED = -7;
 
 static int isInit __attribute__ ((unused))= 0;
+static int tidInc __attribute__ ((unused))=1;
 static queue Q __attribute__ ((unused))=NULL;
 static ThrdCtlBlk *currentBlock __attribute__ ((unused))=NULL;
 
@@ -42,6 +43,7 @@ Tid ULT_CreateThread(void (*fn)(void *), void *parg);
 Tid ULT_Yield(Tid tid);
 Tid ULT_DestroyThread(Tid tid);
 
+void stub(void (*root)(void *), void *arg);
 queue q_new();
 int empty(queue q);
 void enqueue(queue q, ThrdCtlBlk n);

@@ -1,6 +1,0 @@
-Starting tests...
-Initial thread returns from Yield(SELF)
-Initial thread returns from Yield(0)
-Initial thread returns from Yield(ANY)
-Initial thread returns from Yield(INVALID)
-Initial thread returns from Yield(INVALID2)
