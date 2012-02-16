@@ -24,6 +24,9 @@ void initQueue() {
  Q = q_new();
  currentBlock=malloc(sizeof(ThrdCtlBlk));
  currentBlock->tid = 0;
+ ucontext_t context, *currentContext = &context;
+ getcontext(currentContext);
+ currentBlock->p=currentContext;
  isInit = 1;
 }
 
@@ -34,7 +37,7 @@ Tid ULT_CreateThread(void (*fn)(void *), void *parg)
    initQueue();
   }
 
-  ucontext_t *newContext=NULL;
+  ucontext_t context, *newContext = &context;
   getcontext(newContext);
   ucontext_t *currentContext = (ucontext_t *)currentBlock->p;
   // updating program counter
@@ -52,14 +55,14 @@ Tid ULT_CreateThread(void (*fn)(void *), void *parg)
   // push args onto stack
   newContext->uc_mcontext.gregs[REG_EBP+8]= (unsigned int)parg;
   ThrdCtlBlk *newBlock = malloc(sizeof(ThrdCtlBlk));
-  newBlock->p = (struct ucontext_t *)newContext;
+  newBlock->p = newContext;
   newBlock->tid = tidInc++;
   enqueue(Q,*newBlock);
   // create a new context
   // intilize it
   // set to this context
-  assert(0); /* TBD */
-  return ULT_FAILED;
+  //assert(0); /* TBD */
+  return newBlock->tid;
 }
 
 
@@ -90,11 +93,11 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
      return ULT_NONE;
    } else {
      //ULT_ANY with stuff on queue
-     ThrdCtlBlk *tmp=NULL;
+     ThrdCtlBlk *tmp=malloc(sizeof(ThrdCtlBlk));
      dequeue(Q,tmp);
-     ucontext_t *currentContext=NULL;
+     ucontext_t context, *currentContext = &context;
      getcontext(currentContext);
-     currentBlock->p = (struct ucontext_t *)currentContext;
+     currentBlock->p = currentContext;
      enqueue(Q,*currentBlock);
      currentBlock = tmp;
      retVal = tmp->tid;
@@ -103,12 +106,12 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
    }
   } else {
    //Doesn't match any of the codes (ULT_ANY, etc)
-    ThrdCtlBlk *tmp=NULL;
-    int queued = extract(Q,wantTid,tmp);
+    ThrdCtlBlk *tmp=malloc(sizeof(ThrdCtlBlk));
+    int queued = dequeue(Q,tmp);
     if(queued) {
-     ucontext_t *currentContext=NULL;
+     ucontext_t context, *currentContext = &context;
      getcontext(currentContext);
-     currentBlock->p = (struct ucontext_t *)currentContext;
+     currentBlock->p = currentContext;
      enqueue(Q,*currentBlock);
      currentBlock = tmp;
      retVal = tmp->tid;
@@ -201,7 +204,7 @@ int extract(queue q, Tid val, ThrdCtlBlk *retval)
           node n = tmp->next;
           p->next = n;
           n->prev = p;
-	  retval = &tmp->block;
+	  *retval = tmp->block;
           return 1;
         }
         else
