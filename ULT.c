@@ -113,7 +113,8 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
   } else {
    //Doesn't match any of the codes (ULT_ANY, etc)
     ThrdCtlBlk *tmp=malloc(sizeof(ThrdCtlBlk));
-    int queued = dequeue(Q,tmp);
+    //int queued = dequeue(Q,tmp);
+    int queued = extract(Q, wantTid, tmp);
     if(queued) {
      ucontext_t context, *currentContext = &context;
      
@@ -134,7 +135,7 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
       return ULT_INVALID;
     }
   }
-  
+  printf("retVal: %d\n", retVal);
   return retVal;
 }
 
@@ -152,7 +153,7 @@ Tid ULT_DestroyThread(Tid tid)
 
 
 
-//////////////// QUEUE MANGAMENT ////////////////
+//////////////// QUEUE MANGAMENT - REMEMBER TO CITE THIS!!!!!!!!!!!!!!!////////////////
 
 #define HEAD(q) q->prev
 #define TAIL(q) q->next
@@ -229,7 +230,8 @@ int extract(queue q, Tid val, ThrdCtlBlk *retval)
         }
         else
         {
-          return 0;
+          //return 0;
+          return 1;
         }
 }
 
