@@ -3,3 +3,6 @@ doTest.grade.out
 doTest2.grade.out
 *.o
 *.swp
+doTest
+doTest2
+libULT.a
