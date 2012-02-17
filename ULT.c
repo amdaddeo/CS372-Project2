@@ -123,7 +123,7 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
      currentBlock->p = currentContext;
      enqueue(Q,*currentBlock);
      //currentBlock = tmp; //orig
-     tmp = currentBlock;
+     //tmp = currentBlock;
      retVal = tmp->tid;
      ucontext_t *nextContext = (ucontext_t *)tmp->p;
      if (flag == 0){
@@ -230,8 +230,7 @@ int extract(queue q, Tid val, ThrdCtlBlk *retval)
         }
         else
         {
-          //return 0;
-          return 1;
+          return 0;
         }
 }
 
