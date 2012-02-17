@@ -96,13 +96,19 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
      ThrdCtlBlk *tmp=malloc(sizeof(ThrdCtlBlk));
      dequeue(Q,tmp);
      ucontext_t context, *currentContext = &context;
+
+     int flag = 0;
      getcontext(currentContext);
      currentBlock->p = currentContext;
      enqueue(Q,*currentBlock);
-     currentBlock = tmp;
+     //currentBlock = tmp; //orig
+     tmp = currentBlock;
      retVal = tmp->tid;
      ucontext_t *nextContext = (ucontext_t *)tmp->p;
-     setcontext(nextContext);
+     if (flag == 0){
+       flag = 1;
+       setcontext(nextContext);
+     }
    }
   } else {
    //Doesn't match any of the codes (ULT_ANY, etc)
@@ -110,17 +116,23 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
     int queued = dequeue(Q,tmp);
     if(queued) {
      ucontext_t context, *currentContext = &context;
+     
+     int flag = 0;
      getcontext(currentContext);
      currentBlock->p = currentContext;
      enqueue(Q,*currentBlock);
-     currentBlock = tmp;
+     //currentBlock = tmp; //orig
+     tmp = currentBlock;
      retVal = tmp->tid;
      ucontext_t *nextContext = (ucontext_t *)tmp->p;
-     setcontext(nextContext);
+     if (flag == 0){
+       flag = 1;
+       setcontext(nextContext);
      }
-     else {
+    }
+    else {
       return ULT_INVALID;
-     }
+    }
   }
   
   return retVal;
@@ -160,9 +172,13 @@ void enqueue(queue q, ThrdCtlBlk n)
 {
         node nd = malloc(sizeof(node_t));
         nd->block = n;
-        if (!HEAD(q)) HEAD(q) = nd;
+        if (!HEAD(q)){
+          HEAD(q) = nd;
+        }
         nd->prev = TAIL(q);
-        if (nd->prev) nd->prev->next = nd;
+        if (nd->prev){
+          nd->prev->next = nd;
+        }
         TAIL(q) = nd;
         nd->next = 0;
 }
@@ -170,11 +186,15 @@ void enqueue(queue q, ThrdCtlBlk n)
 int dequeue(queue q, ThrdCtlBlk *val)
 {
         node tmp = HEAD(q);
-        if (!tmp) return 0;
+        if (!tmp){
+          return 0;
+        }
         *val = tmp->block;
 
         HEAD(q) = tmp->next;
-        if (TAIL(q) == tmp) TAIL(q) = 0;
+        if (TAIL(q) == tmp){
+          TAIL(q) = 0;
+        }
         free(tmp);
 
         return 1;
