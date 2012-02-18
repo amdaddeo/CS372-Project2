@@ -43,17 +43,17 @@ Tid ULT_CreateThread(void (*fn)(void *), void *parg)
   // updating program counter
   newContext->uc_mcontext.gregs[REG_EIP] = (unsigned int)&stub;
   // allocate new stacka
-  newContext->uc_mcontext.gregs[REG_ESP] = (unsigned int)malloc(sizeof(stack_t));
+  newContext->uc_mcontext.gregs[REG_ESP] = (unsigned int)malloc(ULT_MIN_STACK);
  // push pargs onto stack
   newContext->uc_mcontext.gregs[REG_EBP+8]= (unsigned int)parg;
  // push fn onto stack
-  newContext->uc_mcontext.gregs[REG_EBP+12]= (unsigned int)parg;
+  newContext->uc_mcontext.gregs[REG_EBP+12]= (unsigned int)fn;
   // save old frame pointer onto stack
   newContext->uc_mcontext.gregs[REG_EBP+16] = currentContext->uc_mcontext.gregs[REG_EIP];
   // 
   newContext->uc_mcontext.gregs[REG_EBP] = currentContext->uc_mcontext.gregs[REG_EBP];
   // push args onto stack
-  newContext->uc_mcontext.gregs[REG_EBP+8]= (unsigned int)parg;
+  //newContext->uc_mcontext.gregs[REG_EBP+8]= (unsigned int)parg;
   ThrdCtlBlk *newBlock = malloc(sizeof(ThrdCtlBlk));
   newBlock->p = newContext;
   newBlock->tid = tidInc++;
@@ -83,7 +83,7 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
 
   Tid retVal = ULT_ANY;
   if(wantTid == ULT_SELF || wantTid == currentBlock->tid){
-    if(empty(Q) && wantTid != currentBlock->tid) {
+    if(empty(Q) && (wantTid != currentBlock->tid)) {
      retVal = ULT_NONE;
     } else {
      return  wantTid;
@@ -117,15 +117,16 @@ Tid ULT_Yield(Tid wantTid) //give control to wantTid
     int queued = extract(Q, wantTid, tmp);
     if(queued) {
      ucontext_t context, *currentContext = &context;
-     
+   
      int flag = 0;
      getcontext(currentContext);
      currentBlock->p = currentContext;
      enqueue(Q,*currentBlock);
      //currentBlock = tmp; //orig
+     //retVal = currentBlock->tid;
      //tmp = currentBlock;
      retVal = tmp->tid;
-     ucontext_t *nextContext = (ucontext_t *)tmp->p;
+     ucontext_t *nextContext = tmp->p;
      if (flag == 0){
        flag = 1;
        setcontext(nextContext);
@@ -207,7 +208,8 @@ int extract(queue q, Tid val, ThrdCtlBlk *retval)
           return 0;
         }
 
-        node tmp = HEAD(q);
+        //node tmp = HEAD(q);
+        node tmp = q;
         while(tmp->next != 0)  //!(tmp->block == val) && tmp->next != 0)
         {
           ThrdCtlBlk tmpBlock = tmp->block;
@@ -219,18 +221,21 @@ int extract(queue q, Tid val, ThrdCtlBlk *retval)
           tmp = tmp->next;
         }
 
-        if(tmp->next != 0)
+        if(tmp)
         {
-          node p = tmp->prev;
-          node n = tmp->next;
-          p->next = n;
-          n->prev = p;
+          //node p = tmp->prev;
+          //node n = tmp->next;
+          //p->next = n;
+          //n->prev = p;
 	  *retval = tmp->block;
+          HEAD(q) = tmp->next;
+          if (TAIL(q) == tmp){
+             TAIL(q) = 0;
+          }
           return 1;
         }
-        else
-        {
-          return 0;
+        else{
+         return 0;
         }
 }
 
