@@ -30,68 +30,39 @@ void initQueue() {
  isInit = 1;
 }
 
-
 Tid ULT_CreateThread(void (*fn)(void *), void *parg)
 {
   if(isInit == 0) {
    initQueue();
   }
-  
-  //create new thread control block
-  ThrdCtlBlk *newBlock = malloc(sizeof(ThrdCtlBlk));
-  if(!newBlock){
-    return ULT_NOMEMORY;
-  }
 
-  //get the new context
-  getcontext((newBlock->p));
-  
-  //point program counter to beginning of stub function
-  newBlock->p->uc_mcontext.gregs[REG_EIP] = (unsigned int)&stub;
-
-  //set up a pointer to the new stack and start allocating space for it
-  unsigned int* new_stack_pointer = malloc(sizeof(ULT_MIN_STACK));
-  
-  //move pointer down 8 spaces to make room for parg and fn
-  *new_stack_pointer = *new_stack_pointer-1;
-  *new_stack_pointer = (unsigned int)parg;
-  *new_stack_pointer = *new_stack_pointer - 1;
-  *new_stack_pointer = (unsigned int)fn;
-  //*new_stack_pointer-- = (unsigned int)parg;
-  //*new_stack_pointer-- = (unsigned int)fn;
-
-  //create an array to keep track of which tids are being used
-  
-  
-
-  //ucontext_t context, *newContext = &context;
-  //getcontext(newContext);
-  //ucontext_t *currentContext = (ucontext_t *)currentBlock->p;
-  //// updating program counter
-  //newContext->uc_mcontext.gregs[REG_EIP] = (unsigned int)&stub;
-  //// allocate new stacka
-  //newContext->uc_mcontext.gregs[REG_ESP] = (unsigned int)malloc(ULT_MIN_STACK);
- //// push pargs onto stack
+  ucontext_t context, *newContext = &context;
+  getcontext(newContext);
+  ucontext_t *currentContext = (ucontext_t *)currentBlock->p;
+  // updating program counter
+  newContext->uc_mcontext.gregs[REG_EIP] = (unsigned int)&stub;
+  // allocate new stacka
+  newContext->uc_mcontext.gregs[REG_ESP] = (unsigned int)malloc(ULT_MIN_STACK);
+ // push pargs onto stack
+  newContext->uc_mcontext.gregs[REG_EBP+8]= (unsigned int)parg;
+ // push fn onto stack
+  newContext->uc_mcontext.gregs[REG_EBP+12]= (unsigned int)fn;
+  // save old frame pointer onto stack
+  newContext->uc_mcontext.gregs[REG_EBP+16] = currentContext->uc_mcontext.gregs[REG_EIP];
+  // 
+  newContext->uc_mcontext.gregs[REG_EBP] = currentContext->uc_mcontext.gregs[REG_EBP];
+  // push args onto stack
   //newContext->uc_mcontext.gregs[REG_EBP+8]= (unsigned int)parg;
- //// push fn onto stack
-  //newContext->uc_mcontext.gregs[REG_EBP+12]= (unsigned int)fn;
-  //// save old frame pointer onto stack
-  //newContext->uc_mcontext.gregs[REG_EBP+16] = currentContext->uc_mcontext.gregs[REG_EIP];
-  //// 
-  //newContext->uc_mcontext.gregs[REG_EBP] = currentContext->uc_mcontext.gregs[REG_EBP];
-  //// push args onto stack
-  ////newContext->uc_mcontext.gregs[REG_EBP+8]= (unsigned int)parg;
-  //ThrdCtlBlk *newBlock = malloc(sizeof(ThrdCtlBlk));
-  //newBlock->p = newContext;
-  //newBlock->tid = tidInc++;
-  //enqueue(Q,*newBlock);
-  //// create a new context
-  //// intilize it
-  //// set to this context
-  ////assert(0); /* TBD */
-  //return newBlock->tid;
+  ThrdCtlBlk *newBlock = malloc(sizeof(ThrdCtlBlk));
+  newBlock->p = newContext;
+  newBlock->tid = tidInc++;
+  enqueue(Q,*newBlock);
+  // create a new context
+  // intilize it
+  // set to this context
+  //assert(0); /* TBD */
+  return newBlock->tid;
 }
-
 
 
 Tid ULT_Yield(Tid wantTid) //give control to wantTid
@@ -227,6 +198,53 @@ int dequeue(queue q, ThrdCtlBlk *val)
         free(tmp);
 
         return 1;
+}
+
+
+int extract(queue q, Tid val, ThrdCtlBlk *retval)
+{
+        if(empty(q)) {
+          return 0;
+        }
+
+        node tmp = HEAD(q);
+        while(!tmp)  //!(tmp->block == val) && tmp->next != 0)
+        {
+          ThrdCtlBlk tmpBlock = tmp->block;
+          Tid tidval = tmpBlock.tid;
+          if(tidval == val) {
+            break;
+          }
+
+          tmp = tmp->next;
+        }
+
+        if(tmp)
+        {
+          if(tmp == HEAD(q)) {
+           dequeue(q,retval);
+           return 1;
+          }
+          if (TAIL(q) == tmp) {
+            TAIL(q) = 0;
+            node p = tmp->prev;
+            p->next = TAIL(q);
+            *retval = tmp->block;
+            return 1;
+          }
+          else {
+            node p = tmp->prev;
+            node n = tmp->next;
+            p->next = n;
+            n->prev = p;
+            retval = &tmp->block;
+            return 1;
+          }
+        }
+        else
+        {
+          return 0;
+        }
 }
 
 
